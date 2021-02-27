@@ -29,19 +29,41 @@ const typeDefs = gql`
     type Query {
         hello: String
         users: [User!]! #Array cant be null, neither user
+        getUserByEmail(email: String!): User!
+    }
+    
+    type Mutation {
+        createUser(name: String!, email: String): User!
     }
 `;
+
+const users = [
+    { _id: String(Math.random()), name: 'Mel1', email: 'mel1@teste.com', active: true },
+    { _id: String(Math.random()), name: 'Mel2', email: 'mel2@teste.com', active: true },
+    { _id: String(Math.random()), name: 'Mel3', email: 'mel3@teste.com', active: false }
+]
 
 
 //the resolver must match exactly what is written in the gql
 const resolvers = {
     Query: {
         hello: () => 'hello world!',
-        users: () => [
-            { _id: String(Math.random()), name: 'Mel1', email: 'mel1@teste.com', active: true },
-            { _id: String(Math.random()), name: 'Mel2', email: 'mel2@teste.com', active: true },
-            { _id: String(Math.random()), name: 'Mel3', email: 'mel3@teste.com', active: false }
-        ]
+        users: () => users,
+        getUserByEmail: (_, args) => {
+            return users.find(user => user.email === args.email)
+        },
+    },
+    Mutation: {
+        createUser: (_, args) => {
+            const newUser = {
+                _id: String(Math.random()),
+                name: args.name,
+                email: args.email,
+                active: true,
+            }
+            users.push(newUser);
+            return newUser;
+        }
     }
 };
 
